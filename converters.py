@@ -4,6 +4,7 @@ behaviors.
 """
 from behaviors.comments import comment_unconverted_lines
 from behaviors.strings import grab_heredocs
+from behaviors.pretty import strip_php_newlines, add_python_newlines
 
 class Converter(object):
     """
@@ -13,7 +14,7 @@ class Converter(object):
     """
     def __init__(self, behaviors=[]):
         self.php_lines = []
-        self.python_lines = [] #\n terminated!
+        self.python_lines = []
         self.behaviors = behaviors
 
     def convert(self, php_lines):
@@ -33,4 +34,9 @@ class Converter(object):
 # These functions make it super easy to swap-out functionality, but still
 # keep track of what combinations worked in the past.
 def get_converter1():
-    return Converter([grab_heredocs, comment_unconverted_lines])
+    return Converter([
+        strip_php_newlines, 
+        grab_heredocs, 
+        comment_unconverted_lines,
+        add_python_newlines,
+        ])

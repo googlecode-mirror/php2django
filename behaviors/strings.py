@@ -20,7 +20,7 @@ def grab_heredocs(php_lines, python_lines):
         if block_string:
             if end_heredoc_marker in line:
                 block_string = False
-                updated_python_lines.append('"""\n')
+                updated_python_lines.append('"""')
                 continue
             updated_python_lines.append(line)
             continue
@@ -30,7 +30,7 @@ def grab_heredocs(php_lines, python_lines):
             end_heredoc_marker = after[:3] + ';'
             count += 1
             next_string = "HEREDOC_%d" % count
-            updated_php_lines.append( "%s%s\n" % (before, next_string))
+            updated_php_lines.append( "%s%s" % (before, next_string))
             updated_python_lines.append( '%s = """%s' % (next_string, after[3:]))
             continue
         # otherwise, just pass the line through for further processing
