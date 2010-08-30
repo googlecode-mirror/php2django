@@ -56,7 +56,21 @@ class TestSplitPhpLine(unittest.TestCase):
                     "break;",
                     "}"])
 
-class TestConsolidatePhp(): #DISABLED unittest.TestCase):
+class TestConsolidatePhp(unittest.TestCase):
+    def _test(self, source, expected):
+        got, ignore = pretty.consolidate_php(source, expected)
+        # Format a pretty-print message.
+        if len(got) < len(expected):
+            for i in range(0, len(got) - len(expected)):
+                expected.append("")
+        else:
+            for i in range(0, len(expected) - len(got)):
+                got.append("")
+        msg = "\n%s | %s" % ("_____GOT_____".ljust(40), "_____EXPECTED_____")
+        for line, exp in zip(got, expected):
+            msg += "\n%s | %s" % (line.ljust(40), exp)
+        self.assertEqual(got, expected, msg)
+
     def _test(self, source, expected):
         got, ignore = pretty.consolidate_php(source, expected)
         try:
@@ -100,8 +114,7 @@ class TestConsolidatePhp(): #DISABLED unittest.TestCase):
                 echo "Impossible!";
             }
             ?>""")
-        got, ignore = pretty.consolidate_php(source, expected)
-        self.assertEqual(got, expected)
+        self._test(source, expected)
 
     def test_close_brace_ending(self):
         source = string_to_list("""
@@ -114,16 +127,14 @@ class TestConsolidatePhp(): #DISABLED unittest.TestCase):
             ?>""")
         expected = string_to_list("""
             <?php
-            if (true &&
-                false) {
+            if (true && false) {
                 echo "Impossible!";
             }
             else {
                 echo "Right on.";
             }
             ?>""")
-        got, ignore = pretty.consolidate_php(source, expected)
-        self.assertEqual(got, expected)
+        self._test(source, expected)
 
     def test_switch_statement(self):
         source = string_to_list("""
@@ -148,10 +159,10 @@ class TestConsolidatePhp(): #DISABLED unittest.TestCase):
                     break;
             }
             ?>""")
-        got, ignore = pretty.consolidate_php(source, expected)
-        self.assertEqual(got, expected)
+        self._test(source, expected)
 
     def test_break_apart_multiple(self):
+        #TODO: This isn't working! Debug this test!
         source = string_to_list(
             '<?php switch ($i) { '
             'case 0: echo "i equals 0"; break; '
@@ -180,8 +191,7 @@ class TestConsolidatePhp(): #DISABLED unittest.TestCase):
                 echo "False";
             }
             ?>""")
-        got, ignore = pretty.consolidate_php(source, expected)
-        self.assertEqual(got, expected)
+        self._test(source, expected)
 
     def test_reformat_indentation(self):
         source = string_to_list("""
@@ -202,5 +212,4 @@ class TestConsolidatePhp(): #DISABLED unittest.TestCase):
                 }
             }
             ?>""")
-        got, ignore = pretty.consolidate_php(source, expected)
-        self.assertEqual(got, expected)
+        self._test(source, expected)

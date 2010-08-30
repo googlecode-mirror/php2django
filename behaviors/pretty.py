@@ -35,6 +35,15 @@ def _split_php_line(php_line):
     """
     splits  = []
     working = php_line
+    # Split on special tokens.
+    for token in ('<?php', '?>'):
+        parts = working.split(token)
+        if len(parts) > 1:
+            if len(parts[0]) > 0:
+                splits.append(parts[0])
+            splits.append(token)
+            working = parts[1]
+
     # Split on specific characters:
     done = (len(working) < 1)
     while (not done):
@@ -93,16 +102,26 @@ def consolidate_php(php_lines, python_lines):
     for line in splits:
         spaces = INDENT * level
         bare = line.strip()
+        if '<?php' in bare:
+            pretties.append(bare[:5])
+            remain = bare[5:].strip()
+            level = 0
+            continue
         if bare in ('<?php', '?>'):
             pretties.append(bare)
             level = 0
             continue
         if 'case ' in bare:
-            colpos = bare.find(':')
-            if colpos > bare.find('case '):
-                pretties.append(spaces + remain + bare[:colpos])
-                remain = bare[colpos:]
+            if bare[-1] == ':':
+                pretties.append(spaces + remain + bare)
+                remain = ""
+                level += 1
                 continue
+        if 'break;' == bare:
+            pretties.append(spaces + remain + bare)
+            level -= 1
+            remain = ""
+            continue
         if bare[-1] in (';', ):
             pretties.append(spaces + remain + bare)
             remain = ""
@@ -113,25 +132,13 @@ def consolidate_php(php_lines, python_lines):
             remain = ""
             continue
         if bare[-1] in ('}', ):
-            pretties.append(spaces + remain + bare)
             level -= 1
+            spaces = INDENT * level
             if level < 0: level = 0
+            pretties.append(spaces + remain + bare)
             remain = ""
             continue
-    ignored_code = """
-            if len(bare) < 1:
-                pretties.append("")
-                pretty = ""
-                continue
-            for split_token in ('<?php', '<? ', '<% ', '%>', '?>'):
-                if split_token in bare:
-                    before, after = bare.split(split_token)
-                    if len(before.strip()) > 0:
-                        pretties.append(INDENT * level + before)
-                    pretties.append(split_token)
-                    if len(after.strip()) > 0:
-                        pretties.append(INDENT * level + after)
-    """
+        remain = bare + " "
     return (pretties, python_lines)
 
 if __name__ == "__main__":
@@ -142,3 +149,11 @@ if __name__ == "__main__":
     print _split_php_line("if (0) { echo 'test';")
     print _split_php_line("if (0) { echo 'test'; }")
     print _split_php_line("switch ($i) { case 0: echo 'blah'; }")
+    print _split_php_line(
+            '<?php switch ($i) { '
+            'case 0: echo "i equals 0"; break; '
+            'case 1: echo "i equals 1"; break; '
+            'case 2: echo "i equals 2"; break; '
+            '} '
+            'if (true) { echo "True"; } else { echo "False"; }'
+            '?>')
