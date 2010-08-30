@@ -71,23 +71,6 @@ class TestConsolidatePhp(unittest.TestCase):
             msg += "\n%s | %s" % (line.ljust(40), exp)
         self.assertEqual(got, expected, msg)
 
-    def _test(self, source, expected):
-        got, ignore = pretty.consolidate_php(source, expected)
-        try:
-            self.assertEqual(got, expected)
-        except AssertionError:
-            # Pretty-print what we got.
-            if len(got) < len(expected):
-                for i in range(0, len(got) - len(expected)):
-                    expected.append("")
-            else:
-                for i in range(0, len(expected) - len(got)):
-                    got.append("")
-            print "%s | %s" % ("Got".ljust(40), "Expected")
-            for line, exp in zip(got, expected):
-                print "%s | %s" % (line.ljust(40), exp)
-
-
     def test_semicolon_ending(self):
         source = string_to_list("""
             <?php
