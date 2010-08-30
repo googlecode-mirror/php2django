@@ -37,3 +37,12 @@ def grab_heredocs(php_lines, python_lines):
         updated_php_lines.append(line)
 
     return (updated_php_lines, updated_python_lines)
+
+def grab_html(php_lines, python_lines):
+    """
+    Grab HTML blocks and convert them to multi-line strings.
+    """
+    new_php = []
+    new_py = python_lines[:]
+
+    return (new_php, new_py)
