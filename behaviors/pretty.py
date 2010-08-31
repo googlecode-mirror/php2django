@@ -30,7 +30,7 @@ def _split_php_line(php_line):
     Tries to split a php_line into multiple lines. Returns a list of split
     lines. Some items in this list may not be complete lines, but remainders
     of lines.
-    NOTE: This requires:
+    This requires:
     - php_line is a (partial) valid PHP line, without any mix-ins of HTML.
     - Hence, php_line contains no "<?=" or "<%=" tags.
     - It may contain up to one PHP-opening tag (at the beginning)
@@ -101,7 +101,9 @@ def consolidate_php(php_lines, python_lines):
     """Consolidate multi-line php_lines to single-lines.
 
     Does not affect python_lines at all.
-    NOTE: Assumes all php_lines are actually PHP, not embedded HTML.
+    Assumes:
+    - all php_lines are actually PHP, not embedded HTML.
+    - all comments start with # (not // or /*)
     """
     pretties = []
 

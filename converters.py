@@ -2,9 +2,10 @@
 Converters convert PHP code to python code by stringing together multiple
 behaviors.
 """
-from behaviors.comments import comment_unconverted_lines
+from behaviors.comments import comment_unconverted_lines, standardize_comments
 from behaviors.strings import grab_heredocs
 from behaviors.pretty import strip_php_newlines, add_python_newlines
+from behaviors.pretty import consolidate_php
 
 class Converter(object):
     """
@@ -35,8 +36,20 @@ class Converter(object):
 # keep track of what combinations worked in the past.
 def get_converter1():
     return Converter([
-        strip_php_newlines, 
-        grab_heredocs, 
+        strip_php_newlines,
+        grab_heredocs,
+        comment_unconverted_lines,
+        add_python_newlines,
+        ])
+
+# Add PHP-pretty functions in.
+#NOTE: These don't work quite yet, because of the comment behavior issues.
+def get_converter2():
+    return Converter([
+        strip_php_newlines,
+        grab_heredocs,
+        standardize_comments,
+        consolidate_php,
         comment_unconverted_lines,
         add_python_newlines,
         ])

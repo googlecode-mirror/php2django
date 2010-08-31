@@ -39,3 +39,5 @@ class TestHereDoc(unittest.TestCase):
         self.assertEqual(updated_php, expected_php)
         self.assertEqual(updated_python, expected_python)
 
+if __name__ == "__main__":
+    unittest.main()

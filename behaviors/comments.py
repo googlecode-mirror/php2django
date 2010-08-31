@@ -13,3 +13,11 @@ def comment_unconverted_lines(php_lines, python_lines):
 
     return (updated_php_lines, updated_python_lines)
 
+def standardize_comments(php_lines, python_lines):
+    """
+    Convert all PHP comments to use the hash (#) comment character.
+    """
+    new_php = []
+    return (new_php, python_lines)
+
+

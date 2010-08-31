@@ -1,6 +1,6 @@
 import unittest
 import pretty
-from utils import string_to_list
+from utils import string_to_list, side_by_side
 
 class TestStripPhpNewlines(unittest.TestCase):
     def test_strip_newlines(self):
@@ -59,16 +59,7 @@ class TestSplitPhpLine(unittest.TestCase):
 class TestConsolidatePhp(unittest.TestCase):
     def _test(self, source, expected):
         got, ignore = pretty.consolidate_php(source, [])
-        # Format a pretty-print message.
-        if len(got) < len(expected):
-            for i in range(0, len(got) - len(expected)):
-                expected.append("")
-        else:
-            for i in range(0, len(expected) - len(got)):
-                got.append("")
-        msg = "\n%s | %s" % ("_____GOT_____".ljust(40), "_____EXPECTED_____")
-        for line, exp in zip(got, expected):
-            msg += "\n%s | %s" % (line.ljust(40), exp)
+        msg = side_by_side(got, expected)
         self.assertEqual(got, expected, msg)
 
     def test_semicolon_ending(self):
