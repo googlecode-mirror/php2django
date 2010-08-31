@@ -30,19 +30,27 @@ def _split_php_line(php_line):
     Tries to split a php_line into multiple lines. Returns a list of split
     lines. Some items in this list may not be complete lines, but remainders
     of lines.
-    NOTE: This requires php_line to be a (partial) valid PHP line, without any
-    mix-ins of HTML. (This includes the "<?=" and "<%=" tags.)
+    NOTE: This requires:
+    - php_line is a (partial) valid PHP line, without any mix-ins of HTML.
+    - Hence, php_line contains no "<?=" or "<%=" tags.
+    - It may contain up to one PHP-opening tag (at the beginning)
+    - It may contain up to one PHP-closing tag (at the end)
     """
     splits  = []
-    working = php_line
-    # Split on special tokens.
-    for token in ('<?php', '?>'):
-        parts = working.split(token)
-        if len(parts) > 1:
-            if len(parts[0]) > 0:
-                splits.append(parts[0])
-            splits.append(token)
-            working = parts[1]
+    working = php_line.strip()
+    # Detect beginning and ending tags.
+    has_beginning_tag = False
+    has_ending_tag = False
+    for token in ('<?php', '<?', '<%'):
+        if working.find(token) == 0:
+            working = working.replace(token, '')
+            has_beginning_tag = True
+            break
+    for token in ('?>', '%>'):
+        if len(working) > 2 and working[-2:] == token:
+            working = working.replace(token, '')
+            has_ending_tag = True
+            break
 
     # Split on specific characters:
     done = (len(working) < 1)
@@ -78,7 +86,14 @@ def _split_php_line(php_line):
     # Strip them all.
     strips = []
     for line in splits:
-        strips.append(line.strip())
+        stripped = line.strip()
+        if len(stripped) > 0:
+            strips.append(stripped)
+    # Handle beginning and ending tags.
+    if has_beginning_tag:
+        strips.insert(0, "<?php")
+    if has_ending_tag:
+        strips.append("?>")
     return strips
 
 

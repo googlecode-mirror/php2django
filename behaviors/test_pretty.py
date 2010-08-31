@@ -58,7 +58,7 @@ class TestSplitPhpLine(unittest.TestCase):
 
 class TestConsolidatePhp(unittest.TestCase):
     def _test(self, source, expected):
-        got, ignore = pretty.consolidate_php(source, expected)
+        got, ignore = pretty.consolidate_php(source, [])
         # Format a pretty-print message.
         if len(got) < len(expected):
             for i in range(0, len(got) - len(expected)):
@@ -196,3 +196,14 @@ class TestConsolidatePhp(unittest.TestCase):
             }
             ?>""")
         self._test(source, expected)
+
+    def test_standard_begin_end_tags(self):
+        source = string_to_list("<% echo 'hi'; %>")
+        expected = string_to_list("""
+            <?php
+            echo 'hi';
+            ?>""")
+        self._test(source, expected)
+
+if __name__ == "__main__":
+    unittest.main()
