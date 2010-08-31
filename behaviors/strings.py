@@ -41,7 +41,10 @@ def grab_heredocs(php_lines, python_lines):
 def grab_html(php_lines, python_lines):
     """
     Grab HTML blocks and convert them to multi-line strings.
+    This should essentially turn the entire php_lines into one, valid, parsable
+    PHP block with all the HTML converted to "echo" statements.
     """
+    #TODO
     new_php = []
     new_py = python_lines[:]
 
